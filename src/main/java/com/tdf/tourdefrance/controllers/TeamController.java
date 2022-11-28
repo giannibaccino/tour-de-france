@@ -18,12 +18,16 @@ public class TeamController {
 
     @PostMapping("/create")
     public Mono<TeamDto> create(@RequestBody Team team) {
-        return service.create(team);
+        if(team.getTeamId().matches("^[a-zA-Z0-9]*$"))
+            return service.create(team);
+        return Mono.error(new Error("Invalid id (alphanumeric)"));
     }
 
     @PutMapping("/changeName/{teamId}")
     public Mono<TeamDto> updateName(@PathVariable("teamId") String teamId, @RequestBody String newName) {
-        return service.updateName(teamId, newName);
+        if(teamId.matches("^[a-zA-Z0-9]*$"))
+            return service.updateName(teamId, newName);
+        return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
     }
 
     @GetMapping()
@@ -33,7 +37,9 @@ public class TeamController {
 
     @GetMapping("/getTeam/{teamId}")
     public Mono<TeamDto> findById(@PathVariable("teamId") String teamId) {
-        return service.findByTeamId(teamId);
+        if(teamId.matches("^[a-zA-Z0-9]*$"))
+            return service.findByTeamId(teamId);
+        return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
     }
 
     @GetMapping("/getTeamsByCountry/{country}")

@@ -26,24 +26,38 @@ public class CyclistController {
 
     @PostMapping("/create")
     public Mono<CyclistDto> create(@RequestBody Cyclist cyclist) {
-        return service.create(cyclist);
+        if(cyclist.getCyclistId() <= 999)
+            return service.create(cyclist);
+        return Mono.error(new Error("Invalid Id (1-999)"));
     }
 
     //TODO: Validate teamId and cyclistId
     @PostMapping("/addToTeam/{cylcistId}/{teamId}")
     public Mono<TeamDto> addToTeam(@PathVariable("cylcistId") String cylcistId, @PathVariable("teamId") String teamId) {
-        return service.addCyclistToTeam(Integer.valueOf(cylcistId), teamId);
+        if(Integer.valueOf(cylcistId) <= 999) {
+            if(teamId.matches("^[a-zA-Z0-9]*$"))
+                return service.addCyclistToTeam(Integer.valueOf(cylcistId), teamId);
+            return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
+        }
+        return Mono.error(new Error("Cyclist Id does not exist (1-999)"));
     }
 
     //TODO: Validate teamId and cyclistId
     @PostMapping("/removeFromTeam/{cylcistId}/{teamId}")
     public Mono<TeamDto> removeFromTeam(@PathVariable("cylcistId") String cylcistId, @PathVariable("teamId") String teamId) {
-        return service.removeCyclistFromTeam(Integer.valueOf(cylcistId), teamId);
+        if(Integer.valueOf(cylcistId) <= 999) {
+            if (teamId.matches("^[a-zA-Z0-9]*$"))
+                return service.removeCyclistFromTeam(Integer.valueOf(cylcistId), teamId);
+            return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
+        }
+        return Mono.error(new Error("Cyclist Id does not exist (1-999)"));
     }
 
     @PutMapping("/changeName/{cyclistId}")
     public Mono<CyclistDto> updateName(@PathVariable("cyclistId") String cyclistId, @RequestBody String newName) {
-        return service.updateName(Integer.valueOf(cyclistId), newName);
+        if(Integer.valueOf(cyclistId) <= 999)
+            return service.updateName(Integer.valueOf(cyclistId), newName);
+        return Mono.error(new Error("Cyclist Id does not exist (1-999)"));
     }
 
     @GetMapping()
@@ -53,7 +67,9 @@ public class CyclistController {
 
     @GetMapping("/getCyclist/{cyclistId}")
     public Mono<CyclistDto> findById(@PathVariable("cyclistId") String cyclistId) {
-        return service.findByCyclistId(Integer.valueOf(cyclistId));
+        if(Integer.valueOf(cyclistId) <= 999)
+            return service.findByCyclistId(Integer.valueOf(cyclistId));
+        return Mono.error(new Error("Cyclist Id does not exist (1-999)"));
     }
 
     @GetMapping("/getCyclistsByNationality/{country}")
@@ -63,11 +79,15 @@ public class CyclistController {
 
     @GetMapping("/getCyclistByTeamId/{teamId}")
     public Flux<CyclistDto> findByTeamId(@PathVariable("teamId") String teamId) {
-        return Flux.fromIterable((AppUtils.dtoToTeam(teamService.findByTeamId(teamId).block()).getCyclists().stream().map(AppUtils::cyclistToDto).collect(Collectors.toSet())));
+        if (teamId.matches("^[a-zA-Z0-9]*$"))
+            return Flux.fromIterable((AppUtils.dtoToTeam(teamService.findByTeamId(teamId).block()).getCyclists().stream().map(AppUtils::cyclistToDto).collect(Collectors.toSet())));
+        return Flux.error(new Error("Team Id does not exist (alphanumeric)"));
     }
 
     @DeleteMapping("/deleteCyclist/{cyclistId}")
     public Mono<Void> deleteTeam(@PathVariable("cyclistId") String cyclistId) {
-        return service.delete(Integer.valueOf(cyclistId));
+        if(Integer.valueOf(cyclistId) <= 999)
+            return service.delete(Integer.valueOf(cyclistId));
+        return Mono.error(new Error("Cyclist Id does not exist (1-999)"));
     }
 }
