@@ -3,12 +3,10 @@ package com.tdf.tourdefrance.controllers;
 import com.tdf.tourdefrance.dtos.CyclistDto;
 import com.tdf.tourdefrance.dtos.TeamDto;
 import com.tdf.tourdefrance.models.Cyclist;
-import com.tdf.tourdefrance.models.Team;
 import com.tdf.tourdefrance.services.ICyclistService;
 import com.tdf.tourdefrance.services.ITeamService;
 import com.tdf.tourdefrance.utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +33,7 @@ public class CyclistController {
     @PostMapping("/addToTeam/{cylcistId}/{teamId}")
     public Mono<TeamDto> addToTeam(@PathVariable("cylcistId") String cylcistId, @PathVariable("teamId") String teamId) {
         if(Integer.valueOf(cylcistId) <= 999) {
-            if(teamId.matches("^[a-zA-Z0-9]*$"))
+            if(teamId.matches("^[a-zA-Z0-9]*$") && teamId.length() <= 3)
                 return service.addCyclistToTeam(Integer.valueOf(cylcistId), teamId);
             return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
         }
@@ -46,7 +44,7 @@ public class CyclistController {
     @PostMapping("/removeFromTeam/{cylcistId}/{teamId}")
     public Mono<TeamDto> removeFromTeam(@PathVariable("cylcistId") String cylcistId, @PathVariable("teamId") String teamId) {
         if(Integer.valueOf(cylcistId) <= 999) {
-            if (teamId.matches("^[a-zA-Z0-9]*$"))
+            if (teamId.matches("^[a-zA-Z0-9]*$") && teamId.length() <= 3)
                 return service.removeCyclistFromTeam(Integer.valueOf(cylcistId), teamId);
             return Mono.error(new Error("Team Id does not exist (alphanumeric)"));
         }
@@ -79,7 +77,7 @@ public class CyclistController {
 
     @GetMapping("/getCyclistByTeamId/{teamId}")
     public Flux<CyclistDto> findByTeamId(@PathVariable("teamId") String teamId) {
-        if (teamId.matches("^[a-zA-Z0-9]*$"))
+        if (teamId.matches("^[a-zA-Z0-9]*$") && teamId.length() <= 3)
             return Flux.fromIterable((AppUtils.dtoToTeam(teamService.findByTeamId(teamId).block()).getCyclists().stream().map(AppUtils::cyclistToDto).collect(Collectors.toSet())));
         return Flux.error(new Error("Team Id does not exist (alphanumeric)"));
     }

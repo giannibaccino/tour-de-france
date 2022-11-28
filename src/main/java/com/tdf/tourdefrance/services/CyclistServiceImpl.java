@@ -3,13 +3,11 @@ package com.tdf.tourdefrance.services;
 import com.tdf.tourdefrance.dtos.CyclistDto;
 import com.tdf.tourdefrance.dtos.TeamDto;
 import com.tdf.tourdefrance.models.Cyclist;
-import com.tdf.tourdefrance.models.Team;
 import com.tdf.tourdefrance.repositories.ICyclistRepository;
 import com.tdf.tourdefrance.repositories.ITeamRepository;
 import com.tdf.tourdefrance.utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

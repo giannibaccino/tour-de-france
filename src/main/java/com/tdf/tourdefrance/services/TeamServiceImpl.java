@@ -1,7 +1,6 @@
 package com.tdf.tourdefrance.services;
 
 import com.tdf.tourdefrance.dtos.TeamDto;
-import com.tdf.tourdefrance.models.Cyclist;
 import com.tdf.tourdefrance.models.Team;
 import com.tdf.tourdefrance.repositories.ITeamRepository;
 import com.tdf.tourdefrance.utils.AppUtils;
@@ -18,7 +17,7 @@ public class TeamServiceImpl implements ITeamService{
 
     @Override
     public Mono<TeamDto> create(Team team) {
-        if(team.getTeamId().length() <= 3)
+        if(team.getTeamId().length() <= 3 && team.getTeamId().matches("^[a-zA-Z0-9]*$"))
             return repo.save(team).thenReturn(AppUtils.teamToDto(team));
         return Mono.empty();
     }
